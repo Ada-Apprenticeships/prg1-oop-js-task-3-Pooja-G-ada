@@ -1,3 +1,4 @@
+// Priority levels 
 PRIORITY = { "LOW": 1, "MEDIUM": 3, "HIGH": 5, "URGENT": 7 };
 
 // Function to check if a value is a valid integer using regular expression
@@ -9,8 +10,7 @@ function validInteger (value) {
 // Function to validate and normalize a priority value
 function validatePriority(priority) { 
   const validPriorties = [1, 3, 5, 7];
-  priority = parseInt(priority)
-  return (validPriorties.includes(priority)) ? priority : 1
+  return (validPriorties.includes(parseInt(priority))) ? parseInt(priority) : 1
 }
 
 // Function to get the formatted date string for today
@@ -68,9 +68,9 @@ class ToDo {
 
   // Removes a task from the list by title and returns true if successful, false otherwise
   remove(title){
-    const foundTask = this._tasks.find(task => task.title === title)
+    const foundTask = this._tasks.find(task => task.title === title);
     if (foundTask !== undefined){
-      this._tasks = this._tasks.filter(task => task._title !== title)
+      this._tasks = this._tasks.filter(task => task._title !== title);
       return true;
     }
     return false;
@@ -80,7 +80,7 @@ class ToDo {
   list(priority = 0){
     let mappedTasksArray = this._tasks.map(task => [task.added, task.title, task.priority]);
     if (priority !== 0){
-      return mappedTasksArray.filter(task => task[2]  === priority)
+      return mappedTasksArray.filter(task => task[2]  === priority);
     } 
     return mappedTasksArray;
   }
@@ -88,8 +88,8 @@ class ToDo {
   // Retrieves a specific task by title and returns it or throws an error if not found
   task(title){
     const foundTask = this._tasks.find(task => task.title === title);
-    if (foundTask) return foundTask
-    throw new Error(`Task '${title}' Not Found`)
+    if (foundTask) return foundTask;
+    throw new Error(`Task '${title}' Not Found`);
   }
 
 }
