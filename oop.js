@@ -98,33 +98,20 @@ class ToDo {
   }
 
   remove(title){
-    // console.log(this._tasks)
-    const taskIndex = this._tasks.findIndex(task => task.title === title);
-    // // console.log(taskIndex)
-    if (taskIndex !== -1) {
-      this._tasks.splice(taskIndex, 1);
+    const foundTask = this._tasks.find(task => task.title === title)
+    if (foundTask !== undefined){
+      this._tasks = this._tasks.filter(task => task._title !== title)
       return true;
     }
     return false;
-    // const foundTask = this._tasks.filter(task => task.title === title)
-    // if (foundTask === undefined){
-    //   return false;
-    // } else {
-    //   this._tasks = this._tasks.filter(task => task._title !== title)
-    //   return true;
-    // }
   }
 
   list(priority = 0){
+    let mappedTasksArray = this._tasks.map(task => [task.added, task.title, task.priority]);
     if (priority !== 0){
-      let filteredTasks = this._tasks.filter(task => task.priority  === priority)
-      console.log(filteredTasks);
-      let filteredTasksArray = filteredTasks.map(task => [task.added, task.title, task.priority])
-      return filteredTasksArray
+      return mappedTasksArray.filter(task => task[2]  === priority)
     } 
-    // console.log(this.tasks)
-    let filteredTasksArray = this._tasks.map(task => [task.added, task.title, task.priority])
-    return filteredTasksArray
+    return mappedTasksArray;
   }
 
   task(title){
@@ -132,7 +119,7 @@ class ToDo {
     if (foundTask) {
       return foundTask
     }
-    throw new Error(`Task '${title}' Not found`)
+    throw new Error(`Task '${title}' Not Found`)
   }
 
 }
