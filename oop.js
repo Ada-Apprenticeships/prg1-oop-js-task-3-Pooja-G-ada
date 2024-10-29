@@ -33,13 +33,13 @@ function validatePriority(priority) { // value can be a string or a number (inte
 
 
 function todaysDate () {
-  const todaysDate = new Date()
-  const todaysYear = todaysDate.getFullYear()
+  const todaysDate = new Date();
+  const todaysYear = todaysDate.getFullYear();
   const todaysMonth = todaysDate.getMonth() +1;
-  const todaysDay = todaysDate.getDate()
-  const todaysHours = todaysDate.getHours()
+  const todaysDay = todaysDate.getDate();
+  const todaysHours = String(todaysDate.getHours()).padStart(2, "0");
   const todaysMinutes = String(todaysDate.getMinutes()).padStart(2, "0");
-  const todaysSeconds = String(todaysDate.getSeconds()).padStart(2, "0")
+  const todaysSeconds = String(todaysDate.getSeconds()).padStart(2, "0");
   return `${todaysDay}/${todaysMonth}/${todaysYear} ${todaysHours}:${todaysMinutes}:${todaysSeconds}`
 }
 
@@ -53,7 +53,7 @@ class Task  {
   constructor(title, priority){
     this._added = todaysDate();
     this._title = title;
-    this._priority = priority;
+    this._priority = validatePriority(priority);
   }
   // (title; priority)
   get added(){
@@ -86,69 +86,96 @@ class Task  {
 
 
 class ToDo {
+  _tasks;
+
   constructor() {
-    this.tasks = [];
+    this._tasks = [];
   }
 
   add(task) {
-    this.tasks.push(task)
-    return this.tasks.length;
+    this._tasks.push(task)
+    return this._tasks.length;
   }
 
-  remove(taskTitle){
-    if (taskTitle)
-    this.tasks = this.tasks.filter(task => task._title !== taskTitle)
-    this.tasks = this.tasks.filter(task => task._title !== taskTitle)
-    return true;
+  remove(title){
+    // console.log(this._tasks)
+    const taskIndex = this._tasks.findIndex(task => task.title === title);
+    // // console.log(taskIndex)
+    if (taskIndex !== -1) {
+      this._tasks.splice(taskIndex, 1);
+      return true;
+    }
+    return false;
+    // const foundTask = this._tasks.filter(task => task.title === title)
+    // if (foundTask === undefined){
+    //   return false;
+    // } else {
+    //   this._tasks = this._tasks.filter(task => task._title !== title)
+    //   return true;
+    // }
   }
 
   list(priority = 0){
     if (priority !== 0){
-      this.tasks = this.tasks.filter(task => task._priority  === priority)
+      let filteredTasks = this._tasks.filter(task => task.priority  === priority)
+      console.log(filteredTasks);
+      let filteredTasksArray = filteredTasks.map(task => [task.added, task.title, task.priority])
+      return filteredTasksArray
     } 
-    this.tasks = this.tasks.map(task => [task._added, task._title, task._priority])
-    return this.tasks
+    // console.log(this.tasks)
+    let filteredTasksArray = this._tasks.map(task => [task.added, task.title, task.priority])
+    return filteredTasksArray
   }
 
-  task(){
-
+  task(title){
+    const foundTask = this._tasks.find(task => task.title === title);
+    if (foundTask) {
+      return foundTask
+    }
+    throw new Error(`Task '${title}' Not found`)
   }
 
 }
 
 // test ToDo
-taskList = new ToDo () // Creates an instance of ToDo named taskList
-taskList.add (new Task( 'Get Cappuccino', PRIORITY [ 'HIGH' ]) ) //-> 1  // Adds a new Task instance to the taskList instance and returns the number of tasks in the list: (1) in this case.
-taskList.add (new Task( 'Order Lunch', PRIORITY [ 'MEDIUM' ]) ) //-> 2 // Adds a second Task instance to the taskList instance and returns the number of tasks in the list: (2) now.
-taskList.add (new Task( 'Complete Project Sprint', PRIORITY [ 'MEDIUM' ]) ) //-> 3 // Adds a third Task instance to the taskList instance and returns the number of tasks in the list: (3) now. 
-taskList.list (PRIORITY [ 'MEDIUM' ] ) //->  // Calls the list method of the taskList instance and a list of lists is returned with all the MEDIUM priority tasks.
-  // [
-  //   [ '28/3/2023 10:16:56', 'Order Lunch', 3 ], 
-  //   [ '28/3/2023 10:16:56', 'Complete Project Sprint', 3 ]
-  // ]
-taskList.list ( PRIORITY['HIGH'] ) //->  //  Calls the list method of the taskList instance and a list of lists is returned with all the HIGH priority tasks.
-  // [
-  //   [ '28/3/2023 10:16:56', 'Get Cappuccino', 5 ]
-  // ]
-// taskList.task ('Complete Project Sprint').priority = PRIORITY['HIGH'] // Changes a specific task to have a HIGH priority.
-taskList.list ( PRIORITY['HIGH'] ) // Calls the list method of the taskList instance and a list of lists is returned with all the HIGH priority tasks.
-  // [
-  //   [ '28/3/2023 10:16:56', 'Get Cappuccino', 5 ], 
-  //   [ '28/3/2023 10:16:56', 'Complete Project Sprint', 5 ]
-  // ]
-// taskList.list ( PRIORITY['HIGH'] ) [0] [1] //-> 'Get Cappuccino'   // Calls the list method of the taskList instance and accesses the [0][1] position of the object, returning the task name.
-taskList.remove ( 'Complete Project Sprint1' ) //-> false  // Calls the remove method and 'false' is returned, as a task with this name doesn't exist.
-taskList.remove ( 'Complete Project Sprint' ) //-> true // Calls the remove method and 'true' is returned, as a task with this name DOES exist.
-// taskList.list ( PRIORITY['HIGH'] ) //-> //  Calls the list method of the taskList instance and a list of lists is returned with all the HIGH priority tasks. (Only one now)
-  // [
-  //   [ '28/3/2023 10:16:56', 'Get Cappuccino', 5 ], 
-  // ]
-// taskList.task ( 'WrongTitle' ) //-> // throw error <Task 'WrongTitle' Not Found> as task with this name doesn't exist.
+// taskList = new ToDo () // Creates an instance of ToDo named taskList
+// taskList.add (new Task( 'Get Cappuccino', PRIORITY [ 'HIGH' ]) ) //-> 1  // Adds a new Task instance to the taskList instance and returns the number of tasks in the list: (1) in this case.
+// taskList.add (new Task( 'Order Lunch', PRIORITY [ 'MEDIUM' ]) ) //-> 2 // Adds a second Task instance to the taskList instance and returns the number of tasks in the list: (2) now.
+// taskList.add (new Task( 'Complete Project Sprint', PRIORITY [ 'MEDIUM' ]) ) //-> 3 // Adds a third Task instance to the taskList instance and returns the number of tasks in the list: (3) now. 
+// // console.log(taskList.list())
+// // taskList.list (PRIORITY [ 'MEDIUM' ] ) //->  // Calls the list method of the taskList instance and a list of lists is returned with all the MEDIUM priority tasks.
+// // console.log(taskList.list ( PRIORITY['MEDIUM'] )) 
+// // [
+//   //   [ '28/3/2023 10:16:56', 'Order Lunch', 3 ], 
+//   //   [ '28/3/2023 10:16:56', 'Complete Project Sprint', 3 ]
+//   // ]
+// // taskList.list ( PRIORITY['HIGH'] ) //->  //  Calls the list method of the taskList instance and a list of lists is returned with all the HIGH priority tasks.
+// // console.log(taskList.list ( PRIORITY['HIGH'] )) 
+// // [
+//   //   [ '28/3/2023 10:16:56', 'Get Cappuccino', 5 ]
+//   // ]
+// // taskList.task ('Complete Project Sprint').priority = PRIORITY['HIGH'] // Changes a specific task to have a HIGH priority.
+// // taskList.list ( PRIORITY['HIGH'] ) // Calls the list method of the taskList instance and a list of lists is returned with all the HIGH priority tasks.
+// // console.log(taskList.list ( PRIORITY['HIGH'] )) // Calls the list method of the taskList instance and a list of lists is returned with all the HIGH priority tasks.
+// // [
+//   //   [ '28/3/2023 10:16:56', 'Get Cappuccino', 5 ], 
+//   //   [ '28/3/2023 10:16:56', 'Complete Project Sprint', 5 ]
+//   // ]
+// // taskList.list ( PRIORITY['HIGH'] ) [0] [1] //-> 'Get Cappuccino'   // Calls the list method of the taskList instance and accesses the [0][1] position of the object, returning the task name.
+// taskList.remove ( 'Complete Project Sprint1' ) //-> false  // Calls the remove method and 'false' is returned, as a task with this name doesn't exist.
+// taskList.remove ( 'Complete Project Sprint' ) //-> true // Calls the remove method and 'true' is returned, as a task with this name DOES exist.
+// // taskList.list ( PRIORITY['HIGH'] ) //-> //  Calls the list method of the taskList instance and a list of lists is returned with all the HIGH priority tasks. (Only one now)
+//   // [
+//   //   [ '28/3/2023 10:16:56', 'Get Cappuccino', 5 ], 
+//   // ]
+// // taskList.task ( 'WrongTitle' ) //-> // throw error <Task 'WrongTitle' Not Found> as task with this name doesn't exist.
 
-// const taskList = new ToDo() // creates an instance of a ToDo() object name taskList
-// taskList.add(new Task ('Get Pasta', PRIORITY ['MEDIUM'])) // returns 1 as 1 task in list
-// taskList.add (new Task ('Get Breakfast Cereal', PRIORITY ['MEDIUM'] )) // returns 2 as 2 tasks in list
-// taskList.remove ('Get Breakfast Cereal') // returns true (as task exists, and then removes it)
+const taskList = new ToDo() // creates an instance of a ToDo() object name taskList
+taskList.add(new Task ('Get Pasta', PRIORITY ['MEDIUM'])) // returns 1 as 1 task in list
+taskList.add (new Task ('Get Breakfast Cereal', PRIORITY ['MEDIUM'] )) // returns 2 as 2 tasks in list
+// console.log(taskList.list())
+taskList.remove ('Get Breakfast Cereal') // returns true (as task exists, and then removes it)
+taskList.remove ('Get dinner') // returns true (as task exists, and then removes it)
 // console.log(taskList.list())
 
 
